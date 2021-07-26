@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="node3" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="me.appr.booking.ApplicationKt" />
+    <module name="booking.booking-service.main" />
+    <option name="VM_PARAMETERS" value="-Dconfig.resource=local3.conf" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
