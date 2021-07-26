@@ -35,6 +35,8 @@ tasks.test {
 }
 
 dependencies {
+    implementation(kotlin("reflect"))
+
     implementation(platform("com.lightbend.akka:akka-platform-dependencies_${scala_binary_version}:${akka_platform_version}"))
 
     implementation("com.typesafe.akka:akka-http_${scala_binary_version}")
