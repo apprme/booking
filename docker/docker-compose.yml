@@ -19,9 +19,10 @@ services:
       CLUSTER_PORT: 1600
       CLUSTER_IP: seed
       SEED_PORT_1600_TCP_ADDR: seed
-    entrypoint: java -Dconfig.resource=compose.conf -jar /app/app.jar
+    entrypoint: java -Dconfig.file=/app/compose.conf -jar /app/app.jar
     volumes:
       - '../booking-service/build/libs/booking-service.jar:/app/app.jar:ro'
+      - './compose.conf:/app/compose.conf:ro'
     depends_on:
       - postgres
 
@@ -36,9 +37,10 @@ services:
       CLUSTER_PORT: 1600
       CLUSTER_IP: akka1
       SEED_PORT_1600_TCP_ADDR: seed
-    command: java -Dconfig.resource=compose.conf -jar /app/app.jar
+    entrypoint: java -Dconfig.file=/app/compose.conf -jar /app/app.jar
     volumes:
       - '../booking-service/build/libs/booking-service.jar:/app/app.jar:ro'
+      - './compose.conf:/app/compose.conf:ro'
     depends_on:
       - seed
 
@@ -53,9 +55,10 @@ services:
       CLUSTER_PORT: 1600
       CLUSTER_IP: akka2
       SEED_PORT_1600_TCP_ADDR: seed
-    command: java -Dconfig.resource=compose.conf -jar /app/app.jar
+    entrypoint: java -Dconfig.file=/app/compose.conf -jar /app/app.jar
     volumes:
       - '../booking-service/build/libs/booking-service.jar:/app/app.jar:ro'
+      - './compose.conf:/app/compose.conf:ro'
     depends_on:
       - seed
 

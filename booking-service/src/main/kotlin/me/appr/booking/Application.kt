@@ -16,6 +16,7 @@ import akka.http.javadsl.server.PathMatchers.uuidSegment
 import akka.http.javadsl.server.RejectionHandler
 import akka.http.javadsl.server.Route
 import akka.http.javadsl.server.directives.RouteDirectives
+import akka.management.javadsl.AkkaManagement
 import akka.pattern.StatusReply
 import akka.persistence.jdbc.testkit.javadsl.SchemaUtils
 import com.fasterxml.jackson.annotation.JsonInclude
@@ -154,6 +155,8 @@ class Application(private val sharding: ClusterSharding) : AllDirectives() {
 
 fun main() {
     val system = ActorSystem.create<Unit>(Behaviors.empty(), "booking")
+    AkkaManagement.get(system).start()
+
     SchemaUtils.createIfNotExists(system)
 
     TripEntity.init(system)
