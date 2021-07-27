@@ -113,11 +113,19 @@ internal fun TripEntity.onReservedCapacityChanged(
 internal fun TripEntity.onReservationCancelled(state: Trip, command: CancelReservation) =
     when (val reservedCapacity = state.getReservedCapacity()) {
         0 -> command.replyWithError(NotFoundException("Reservation not found"))
-        else -> command.persistThenReplyConstant(
-            ReservedCapacityChanged(id, command.reservationId, reservedCapacity, 0),
-            Done.done()
-        )
+        else -> {
+            val event = ReservedCapacityChanged(
+                tripId = id,
+                reservationId = command.reservationId,
+                oldCapacity = reservedCapacity,
+                newCapacity = 0
+            )
+            command.persistThenReplyConstant(event, Done.done())
+        }
     }
 
 internal fun TripEntity.onGet(state: Trip, command: GetTrip) =
     Effect().reply(command.replyTo, StatusReply.success(state.toSummary()))
+
+internal fun TripEntity.onListReservations(state: Trip, command: ListReservations) =
+    Effect().reply(command.replyTo, StatusReply.success(state.listReservations()))

@@ -153,6 +153,40 @@ class ApplicationIT {
         assertErrorCode(ErrorCodes.not_found, StatusCodes.NOT_FOUND, result)
     }
 
+    @Test
+    fun `should list exising reservations`() {
+        val trip = create("A", 10)
+
+        book(trip, "p1", 8)
+        book(trip, "p2", 2)
+
+        val result = listReservations(trip).list
+        assertEquals(2, result.size)
+
+        val p1 = result.first { it.name == "p1" }
+        assertEquals("p1", p1.name)
+        assertEquals(8, p1.capacity)
+
+        val p2 = result.first { it.name == "p2" }
+        assertEquals("p2", p2.name)
+        assertEquals(2, p2.capacity)
+    }
+
+    @Test
+    fun `should not appear in reservation list when cancelled`() {
+        val trip = create("A", 10)
+
+        val reservation = book(trip, "p1", 8) Extract { header("Location") }
+        book(trip, "p2", 2)
+
+        cancel(reservation)
+
+        val result = listReservations(trip).list
+        assertEquals(1, result.size)
+        assertEquals("p2", result[0].name)
+        assertEquals(2, result[0].capacity)
+    }
+
     private fun create(name: String, capacity: Int) = Given {
         port(node.httpPort)
         contentType(ContentType.JSON)
@@ -205,6 +239,16 @@ class ApplicationIT {
         delete(path)
     } Then {
         statusCode(StatusCodes.NO_CONTENT.intValue())
+    }
+
+    private fun listReservations(path: String) = Given {
+        port(node.httpPort)
+    } When {
+        get("$path/reservations")
+    } Then {
+        statusCode(StatusCodes.OK.intValue())
+    } Extract {
+        body().`as`(Trip.Reservations::class.java)
     }
 
     private fun assertErrorCode(code: String, statusCode: StatusCode, r: Response) {

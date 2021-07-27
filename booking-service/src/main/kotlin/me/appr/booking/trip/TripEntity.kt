@@ -41,6 +41,7 @@ class TripEntity(val id: String) :
                     .onCommand(ChangeReservedCapacity::class.java, ::onReservedCapacityChanged)
                     .onCommand(CancelReservation::class.java, ::onReservationCancelled)
                     .onCommand(GetTrip::class.java, ::onGet)
+                    .onCommand(ListReservations::class.java, ::onListReservations)
             )
             .orElse(
                 newCommandHandlerWithReplyBuilder()

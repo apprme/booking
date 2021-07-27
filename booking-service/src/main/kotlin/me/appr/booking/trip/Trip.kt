@@ -1,5 +1,6 @@
 package me.appr.booking.trip
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import me.appr.booking.common.JacksonSerializable
 import java.util.*
 
@@ -17,8 +18,12 @@ class Trip(var capacity: Int = 0, var name: String = "") : JacksonSerializable {
     }
 
     fun updateReservedCapacity(reservationId: String, capacity: Int) {
-        val existing = reservations[reservationId]!!
-        reservations[reservationId] = Reservation(existing.name, capacity)
+        if (capacity == 0) {
+            reservations.remove(reservationId)
+        } else {
+            val existing = reservations[reservationId]!!
+            reservations[reservationId] = Reservation(existing.name, capacity)
+        }
     }
 
     fun updatePassengerName(reservationId: String, name: String) {
@@ -27,6 +32,9 @@ class Trip(var capacity: Int = 0, var name: String = "") : JacksonSerializable {
     }
 
     fun toSummary() = Summary(name, capacity, capacity - getReservedCapacity())
+
+    // creates a snapshot copy (safe to send to other actors)
+    fun listReservations() = Reservations(reservations.values.toList())
 
     fun randomId(): String {
         while (true) {
@@ -40,4 +48,6 @@ class Trip(var capacity: Int = 0, var name: String = "") : JacksonSerializable {
     data class Reservation(val name: String, val capacity: Int) : JacksonSerializable
 
     data class Summary(val name: String, val totalCapacity: Int, val remainingCapacity: Int) : JacksonSerializable
+
+    data class Reservations @JsonCreator constructor(val list: List<Reservation>): JacksonSerializable
 }

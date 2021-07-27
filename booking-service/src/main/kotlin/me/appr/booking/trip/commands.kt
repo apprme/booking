@@ -48,3 +48,7 @@ class CancelReservation(
     val reservationId: String,
     replyTo: ActorRef<StatusReply<Done>>
 ) : Command<Done>(replyTo)
+
+class ListReservations @JsonCreator constructor(
+    replyTo: ActorRef<StatusReply<Trip.Reservations>>
+) : Command<Trip.Reservations>(replyTo)

@@ -86,6 +86,11 @@ class Application(private val sharding: ClusterSharding) : AllDirectives() {
     }
 
     private fun reservationRoutes(tripId: UUID) = concat(
+        get {
+            getTripEntityById(tripId.toString()).onStatusResponse<Trip.Reservations>({
+                ListReservations(it)
+            })
+        },
         post {
             entity(Jackson.unmarshaller(mapper, Trip.Reservation::class.java)) { reservation ->
                 val id = tripId.toString()

@@ -131,6 +131,44 @@ class TripEntityTest {
         assertTrue(result.reply().error is NotFoundException)
     }
 
+    @Test
+    fun `should list exising reservations`() {
+        create("A", 10)
+
+        book("p1", 8)
+        book("p2", 2)
+
+        val result = listReservations()
+        assertTrue(result.reply().isSuccess)
+        val value = result.reply().value.list
+        assertEquals(2, value.size)
+
+        val p1 = value.first { it.name == "p1" }
+        assertEquals("p1", p1.name)
+        assertEquals(8, p1.capacity)
+
+        val p2 = value.first { it.name == "p2" }
+        assertEquals("p2", p2.name)
+        assertEquals(2, p2.capacity)
+    }
+
+    @Test
+    fun `should not appear in reservation list when cancelled`() {
+        create("A", 10)
+
+        val reservationId = book("p1", 8).reply().value
+        book("p2", 2)
+
+        cancel(reservationId)
+
+        val result = listReservations()
+        assertTrue(result.reply().isSuccess)
+        val value = result.reply().value.list
+        assertEquals(1, value.size)
+        assertEquals("p2", value[0].name)
+        assertEquals(2, value[0].capacity)
+    }
+
     private fun get() =
         eventSourcedTestKit.runCommand<StatusReply<Trip.Summary>> {
             GetTrip(it)
@@ -164,6 +202,11 @@ class TripEntityTest {
     private fun updateReservedCapacity(reservationId: String, capacity: Int) =
         eventSourcedTestKit.runCommand<StatusReply<Trip.Reservation>> {
             ChangeReservedCapacity(reservationId, capacity, it)
+        }
+
+    private fun listReservations() =
+        eventSourcedTestKit.runCommand<StatusReply<Trip.Reservations>> {
+            ListReservations(it)
         }
 
     companion object {
