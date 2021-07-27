@@ -49,5 +49,5 @@ class Trip(var capacity: Int = 0, var name: String = "") : JacksonSerializable {
 
     data class Summary(val name: String, val totalCapacity: Int, val remainingCapacity: Int) : JacksonSerializable
 
-    data class Reservations @JsonCreator constructor(val list: List<Reservation>): JacksonSerializable
+    data class Reservations @JsonCreator constructor(val list: List<Reservation>) : JacksonSerializable
 }
