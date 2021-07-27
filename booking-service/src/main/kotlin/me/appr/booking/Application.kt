@@ -133,9 +133,8 @@ class Application(private val sharding: ClusterSharding) : AllDirectives() {
     private fun <T> EntityRef<Command<*>>.onStatusResponse(
         command: (ActorRef<StatusReply<T>>) -> Command<T>,
         reply: (T) -> Route = { ok(it) }
-    ) =
-        onSuccess(askWithStatus(command, Duration.ofSeconds(3)), reply)
-            .seal(RejectionHandler.defaultHandler(), exceptionHandler)
+    ) = onSuccess(askWithStatus(command, Duration.ofSeconds(3)), reply)
+        .seal(RejectionHandler.defaultHandler(), exceptionHandler)
 
     private fun RouteDirectives.created(location: String, obj: Any) =
         complete(StatusCodes.CREATED, listOf(Location.create(location)), obj, Jackson.marshaller(mapper))
@@ -159,9 +158,7 @@ fun main() {
 
 fun init(system: ActorSystem<*>) {
     AkkaManagement.get(system).start()
-
     SchemaUtils.createIfNotExists(system)
-
     TripEntity.init(system)
 
     val config = system.settings().config().getConfig("rest")
