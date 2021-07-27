@@ -78,54 +78,54 @@ class Application(private val sharding: ClusterSharding) : AllDirectives() {
                         }
                     },
                     pathPrefix("reservations") {
-                        concat(
-                            post {
-                                entity(Jackson.unmarshaller(mapper, Trip.Reservation::class.java)) { reservation ->
-                                    val id = tripId.toString()
-                                    getTripEntityById(id).onStatusResponse<String>({
-                                        CreateReservation(reservation.name, reservation.capacity, it)
-                                    }) {
-                                        created("/$id/reservations/$it", reservation)
-                                    }
-                                }
-                            },
-                            pathPrefix(uuidSegment()) { reservationId ->
-                                concat(
-                                    path("name") {
-                                        patch {
-                                            entity(Jackson.unmarshaller(mapper, String::class.java)) { name ->
-                                                getTripEntityById(tripId.toString()).onStatusResponse<Trip.Reservation>(
-                                                    {
-                                                        ChangePassengerName(reservationId.toString(), name, it)
-                                                    })
-                                            }
-                                        }
-                                    },
-                                    path("capacity") {
-                                        patch {
-                                            entity(Jackson.unmarshaller(mapper, Int::class.java)) { capacity ->
-                                                getTripEntityById(tripId.toString()).onStatusResponse<Trip.Reservation>(
-                                                    {
-                                                        ChangeReservedCapacity(reservationId.toString(), capacity, it)
-                                                    })
-                                            }
-                                        }
-                                    },
-                                    delete {
-                                        getTripEntityById(tripId.toString()).onStatusResponse<Done>({
-                                            CancelReservation(reservationId.toString(), it)
-                                        }) {
-                                            complete(StatusCodes.NO_CONTENT)
-                                        }
-                                    }
-                                )
-                            }
-                        )
+                        reservationRoutes(tripId)
                     },
                 )
-            },
+            }
         )
     }
+
+    private fun reservationRoutes(tripId: UUID) = concat(
+        post {
+            entity(Jackson.unmarshaller(mapper, Trip.Reservation::class.java)) { reservation ->
+                val id = tripId.toString()
+                getTripEntityById(id).onStatusResponse<String>({
+                    CreateReservation(reservation.name, reservation.capacity, it)
+                }) {
+                    created("/$id/reservations/$it", reservation)
+                }
+            }
+        },
+        pathPrefix(uuidSegment()) { reservationId ->
+            concat(
+                path("name") {
+                    patch {
+                        entity(Jackson.unmarshaller(mapper, String::class.java)) { name ->
+                            getTripEntityById(tripId.toString()).onStatusResponse<Trip.Reservation>({
+                                ChangePassengerName(reservationId.toString(), name, it)
+                            })
+                        }
+                    }
+                },
+                path("capacity") {
+                    patch {
+                        entity(Jackson.unmarshaller(mapper, Int::class.java)) { capacity ->
+                            getTripEntityById(tripId.toString()).onStatusResponse<Trip.Reservation>({
+                                ChangeReservedCapacity(reservationId.toString(), capacity, it)
+                            })
+                        }
+                    }
+                },
+                delete {
+                    getTripEntityById(tripId.toString()).onStatusResponse<Done>({
+                        CancelReservation(reservationId.toString(), it)
+                    }) {
+                        complete(StatusCodes.NO_CONTENT)
+                    }
+                }
+            )
+        }
+    )
 
     private fun getTripEntityById(id: String) =
         sharding.entityRefFor(TripEntity.ENTITY_KEY, id)
