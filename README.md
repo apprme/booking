@@ -15,7 +15,6 @@ Code challenge featuring event-driven architecture with Akka — implementation 
 * The project comes with Run Configurations for IntelliJ IDEA. Start any of the `node1`, `node2`, or `node3` (or any
   combination of them). HTTP endpoint will be available on ports 8081, 8082, and 8083 respectively.
   
-
 ### docker-compose
 
 Alternatively, you can use docker-compose to start three nodes with NGINX as a simple load-balancer in round-robin
@@ -24,8 +23,10 @@ configuration.
 First, build the project with `./gradlew build` and then execute `docker-compose up` in the `docker` directory.
 NGINX will be available at `http://localhost:9000` 
 
-### test.http
+### Integration tests
 
-Refer to `test.http` for a simple demo of HTTP requests and responses. You should have a server running
-on `localhost:8081` and have [HTTP Client](https://plugins.jetbrains.com/plugin/13121-http-client) plugin
-installed in order to execute these requests from IDEA.
+For tests that require third-party software running alongside the application (for example, PostgreSQL)
+[testcontainers](https://www.testcontainers.org) is used. Before running integration tests make sure 
+you have docker-engine installed and running.
+
+You can run integration tests either from your IDE or, alternatively, by executing `./gradlew integrationTest`

@@ -32,7 +32,7 @@ class Application(private val sharding: ClusterSharding) : AllDirectives() {
 
     private val exceptionHandler = ExceptionHandler.newBuilder()
         .match(ApiException::class.java) { t ->
-            complete(StatusCodes.get(t.intCode), ErrorResponse(t), Jackson.marshaller(mapper))
+            complete(StatusCodes.get(t.intCode), ErrorResponseDTO(t), Jackson.marshaller(mapper))
         }
         .build()
 
@@ -145,16 +145,19 @@ class Application(private val sharding: ClusterSharding) : AllDirectives() {
 
     @Suppress("unused")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private class ErrorResponse(t: ApiException) {
+    class ErrorResponseDTO(t: ApiException) {
         val code = t.code
         val message = t.message
     }
 
-    private class TripDTO(val name: String, val capacity: Int)
+    class TripDTO(val name: String, val capacity: Int)
 }
 
 fun main() {
-    val system = ActorSystem.create<Unit>(Behaviors.empty(), "booking")
+    init(ActorSystem.create<Unit>(Behaviors.empty(), "booking"))
+}
+
+fun init(system: ActorSystem<*>) {
     AkkaManagement.get(system).start()
 
     SchemaUtils.createIfNotExists(system)

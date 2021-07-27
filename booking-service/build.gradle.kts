@@ -26,12 +26,38 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
 tasks.test {
     useJUnitPlatform()
+}
+
+sourceSets {
+    create("testInt") {
+        compileClasspath += sourceSets.main.get().output
+        runtimeClasspath += sourceSets.main.get().output
+    }
+}
+
+val testIntImplementation by configurations.getting {
+    extendsFrom(
+        configurations.implementation.get(),
+        configurations.testImplementation.get()
+    )
+}
+
+configurations["testIntRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
+
+val integrationTest = task<Test>("integrationTest") {
+    description = "Runs integration tests"
+    group = "verification"
+
+    testClassesDirs = sourceSets["testInt"].output.classesDirs
+    classpath = sourceSets["testInt"].runtimeClasspath
+    shouldRunAfter("test")
+    useJUnitPlatform()
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
@@ -56,4 +82,9 @@ dependencies {
 
     testImplementation("com.typesafe.akka:akka-persistence-testkit_${scala_binary_version}")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.2")
+
+    testIntImplementation("org.testcontainers:testcontainers:1.15.3")
+    testIntImplementation("org.testcontainers:junit-jupiter:1.15.3")
+    testIntImplementation("io.rest-assured:rest-assured:4.4.0")
+    testIntImplementation("io.rest-assured:kotlin-extensions:4.4.0")
 }
