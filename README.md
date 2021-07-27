@@ -19,7 +19,7 @@ Code challenge featuring event-driven architecture with Akka — implementation 
 ### docker-compose
 
 Alternatively, you can use docker-compose to start three nodes with NGINX as a simple load-balancer in round-robin
-configuration. Execute `docker-compose up` in the `docker` directory. NGINX will be available at `http://localhost:8080` 
+configuration. Execute `docker-compose up` in the `docker` directory. NGINX will be available at `http://localhost:9000` 
 
 ### test.http
 
