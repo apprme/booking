@@ -27,11 +27,9 @@ internal fun TripEntity.onCapacityChanged(state: Trip, command: ChangeCapacity) 
         )
     }
     else -> {
-        Effect()
-            .persist(CapacityChanged(id, state.capacity, command.capacity))
-            .thenReply(command.replyTo) { updated: Trip ->
-                StatusReply.success(updated.toSummary())
-            }
+        command.persistThenReply(CapacityChanged(id, state.capacity, command.capacity)) {
+            toSummary()
+        }
     }
 }
 
