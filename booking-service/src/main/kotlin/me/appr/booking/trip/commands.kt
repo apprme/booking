@@ -3,7 +3,6 @@ package me.appr.booking.trip
 import akka.Done
 import akka.actor.typed.ActorRef
 import akka.pattern.StatusReply
-import com.fasterxml.jackson.annotation.JsonCreator
 import me.appr.booking.common.JacksonSerializable
 
 abstract class Command<T>(val replyTo: ActorRef<StatusReply<T>>) : JacksonSerializable
@@ -24,7 +23,7 @@ class ChangeCapacity(
     replyTo: ActorRef<StatusReply<Trip.Summary>>
 ) : Command<Trip.Summary>(replyTo)
 
-class GetTrip @JsonCreator constructor(replyTo: ActorRef<StatusReply<Trip.Summary>>) : Command<Trip.Summary>(replyTo)
+class GetTrip(replyTo: ActorRef<StatusReply<Trip.Summary>>) : Command<Trip.Summary>(replyTo)
 
 class CreateReservation(
     val name: String,
@@ -49,6 +48,6 @@ class CancelReservation(
     replyTo: ActorRef<StatusReply<Done>>
 ) : Command<Done>(replyTo)
 
-class ListReservations @JsonCreator constructor(
+class ListReservations(
     replyTo: ActorRef<StatusReply<Trip.Reservations>>
 ) : Command<Trip.Reservations>(replyTo)

@@ -214,8 +214,12 @@ class TripEntityTest {
 
         private val config = """
             akka.actor.serialization-bindings {
-                "${JacksonSerializable::class.qualifiedName}" = jackson-json
+              "${JacksonSerializable::class.qualifiedName}" = jackson-json
             }
+            akka.serialization.jackson {
+              jackson-modules += "akka.serialization.jackson.AkkaTypedJacksonModule"
+              jackson-modules += "com.fasterxml.jackson.module.kotlin.KotlinModule"
+            }            
         """.trimIndent()
     }
 }
