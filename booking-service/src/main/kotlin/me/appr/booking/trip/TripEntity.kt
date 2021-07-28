@@ -12,7 +12,7 @@ import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.javadsl.*
 import java.time.Duration
 
-class TripEntity(val id: String) :
+class TripEntity private constructor(val id: String) :
     EventSourcedBehaviorWithEnforcedReplies<Command<*>, Event, Trip>(
         PersistenceId.of(ENTITY_KEY.name(), id),
         SupervisorStrategy.restartWithBackoff(
