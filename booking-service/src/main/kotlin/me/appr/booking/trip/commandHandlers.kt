@@ -87,7 +87,7 @@ internal fun TripEntity.onReservedCapacityChanged(
             command.replyWithError(NotFoundException("Reservation not found"))
         }
         command.capacity <= 0 -> {
-            command.replyWithError(BadRequestException("Number of reserved spots to should be greater than zero"))
+            command.replyWithError(BadRequestException("Number of reserved spots should be greater than zero"))
         }
         command.capacity > existingReservation.capacity && reservedCapacity >= state.capacity -> {
             command.replyWithError(SoldOutException())
